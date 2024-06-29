@@ -1,10 +1,11 @@
-
 import scrapy
+# noinspection PyUnresolvedReferences
 from news.items import NewsItem
 
 
 class AutohomeSpider(scrapy.Spider):
     name = "autohome"
+
     # allowed_domains = ["autohome.com.cn"]
     # start_urls = ["https://autohome.com.cn"]
 
@@ -33,3 +34,22 @@ class AutohomeSpider(scrapy.Spider):
 
     def parse_article(self, response):
         item = response.meta['item']
+
+        category = response.xpath('//div[@class="breadnav fn-left"]/a[2]/text()').extract_first()
+        item['Category'] = category.replace('\n', '').replace('\t', '').replace('\r', '') if category else ''
+
+        tag = response.xpath('//div[@class="breadnav fn-left"]/a[3]/text()').extract_first()
+        item['Tags'] = tag.replace('\n', '').replace('\t', '').replace('\r', '') if tag else ''
+
+        author = response.xpath('//div[@class="article-info"]/div[@class="name"]/a/text()').extract_first()
+        item['Author'] = author.replace('\n', '').replace('\t', '').replace('\r', '') if author else ''
+
+        date = response.xpath('//div[@class="article-info"]/span[@class="time"]/text()').extract_first()
+        item['Date'] = date.replace('\n', '').replace('\t', '').replace('\r', '') if date else ''
+
+        content_node = response.xpath('//div[@id="articleContent"]')
+        content = content_node.xpath('./p/text()').getall()
+
+        content = ''.join(content) if content else ''
+        item['Content'] = content.replace('\n', '').replace('\t', '').replace('\r', '')
+        yield item
