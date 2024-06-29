@@ -6,11 +6,13 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
+from scrapy.exceptions import DropItem
+from db.sqlserver.database_helper import add_news_to_db
 
 
 class NewsPipeline:
     def process_item(self, item, spider):
-        #TODO 存入数据库
+
         print('===========爬取结果=============' * 5)
         print(f'爬虫: {spider.name}')
 
@@ -25,4 +27,8 @@ class NewsPipeline:
         print(f"标签: {item['Tags']}")
 
         print('===========爬取结束=============' * 5)
+        try:
+            add_news_to_db(item)
+        except ValueError as e:
+            raise DropItem(str(e))
         return item

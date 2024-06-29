@@ -10,7 +10,7 @@ class AutohomeSpider(scrapy.Spider):
     # start_urls = ["https://autohome.com.cn"]
 
     def start_requests(self):
-        for i in range(1, 2):
+        for i in range(1, 3):
             url = f'https://www.autohome.com.cn/hangye/list/{i}'
             yield scrapy.Request(url, callback=self.parse_article_list)
 
